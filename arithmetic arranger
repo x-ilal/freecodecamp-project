@@ -1,0 +1,23 @@
+def arithmetic_arranger(problems):
+    L=["+","*","-","/"]
+    H=[]
+    for i in problems :
+        for j in range(len(i)):
+            if i[j] in L :
+                k=i[j]
+                x=L.index(i[j])
+                a=int(i[:j-1:])
+                b=int(i[j+1::])
+                z=str(a)
+                y=str(b)
+                if x==0 :
+                    R=a+b
+                if x==1:
+                    R=a*b
+                if x==2:
+                    R=a-b
+                if x==3 :
+                    R=a/b
+                H.append(z +k+y+ "=" +str(R))
+                break
+    return "\n".join(H)
