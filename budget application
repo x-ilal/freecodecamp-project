@@ -1,0 +1,101 @@
+class Category:
+    def __init__(self, name):
+        self.name = name
+        self.ledger = []
+
+    def deposit(self, amount, description=""):
+        if description == "":
+            description = ""
+        D = {'amount': amount, 'description': description}
+        self.ledger.append(D)
+        return D
+
+    def withdraw(self, amount, description=""):
+        if not self.check_funds(amount):
+            return False
+        else:
+            D = {'amount': -amount, 'description': description}
+            self.ledger.append(D)
+            return True
+
+    def get_balance(self):
+        s = 0
+        for item in self.ledger:
+            s += item['amount']
+        return s
+
+    def transfer(self, amount, other):
+        if not self.check_funds(amount):
+            return False
+        else:
+            self.withdraw(amount, "Transfer to " + other.name)
+            other.deposit(amount, "Transfer from " + self.name)
+            return True
+
+    def check_funds(self, amount):
+        if self.get_balance() < amount:
+            return False
+        else:
+            return True
+
+    def __str__(self):
+        # Title line
+        title = "*" * ((30 - len(self.name)) // 2) + self.name + "*" * ((30 - len(self.name)) // 2)
+        if len(title) < 30:
+            title += "*"
+        
+        lines = [title]
+        
+        # Ledger items
+        for item in self.ledger:
+            desc = item['description'][:23]
+            amt = f"{item['amount']:.2f}"
+            line = desc + " " * (23 - len(desc)) + " " * (7 - len(amt)) + amt
+            lines.append(line)
+        
+        # Total
+        total = f"Total: {self.get_balance():.2f}"
+        lines.append(total)
+        
+        return "\n".join(lines)
+
+def create_spend_chart(categories):
+    s = 0
+    spending = []
+    
+    for cat in categories:
+        sp = 0
+        for tr in cat.ledger:
+            if tr["amount"] < 0:
+                sp += abs(tr["amount"])  
+        spending.append(sp)  
+        s += sp 
+    percentages = []
+    for i in spending:
+        if s == 0:
+            per = 0
+        else:
+            per = int((((i/s)*100)//10)*10)
+        percentages.append(per)
+    lines = []
+    lines.append("Percentage spent by category")
+    for i in range(100, -1, -10):
+        line = f"{i:3d}| "
+        for per in percentages:
+            if per >= i:
+                line += "o  "
+            else:
+                line += "   "
+        lines.append(line)
+    lines.append("    " + "-" * (3 * len(categories) + 1))
+    max_name_length = max(len(cat.name) for cat in categories)
+    for i in range(max_name_length):
+        line = "     "
+        for cat in categories:
+            if i < len(cat.name):
+                line += cat.name[i] + "  "
+            else:
+                line += "   "
+        lines.append(line.rstrip())
+    return "\n".join(lines)   
+    pass
