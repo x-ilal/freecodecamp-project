@@ -1,49 +1,53 @@
-def add_time(start, duration):
+def add_time(start, duration, day=None):
     n = len(start)
-    K = start[-2:]
+    K = start[-2:]  
     for i in range(n):
         if start[i] == ":":
             a = int(start[:i])        
             b = int(start[i+1:i+3])   
-            break  
+            break
     for j in range(len(duration)):
         if duration[j] == ':':
             c = int(duration[:j])        
             d = int(duration[j+1:j+3])   
             break
-    x=a+c
-    y=b+d
     if K == "PM" and a != 12:
-        a = a + 12
+        a += 12
     if K == "AM" and a == 12:
         a = 0
     total_hours = a + c
     total_minutes = b + d
+
     if total_minutes >= 60:
         total_hours += 1
         total_minutes -= 60
+
     days_later = total_hours // 24
-    final_hours = total_hours % 24
-    if final_hours == 0:
+    final_hours_24 = total_hours % 24
+    if final_hours_24 == 0:
         final_hours = 12
         final_period = "AM"
-    elif final_hours < 12:
+    elif final_hours_24 < 12:
+        final_hours = final_hours_24
         final_period = "AM"
-    elif final_hours == 12:
+    elif final_hours_24 == 12:
+        final_hours = 12
         final_period = "PM"
     else:
-        final_hours -= 12
+        final_hours = final_hours_24 - 12
         final_period = "PM"
     if total_minutes < 10:
-        result = str(final_hours) + ":0" + str(total_minutes) + " " + final_period
+        result = f"{final_hours}:0{total_minutes} {final_period}"
     else:
-        result = str(final_hours) + ":" + str(total_minutes) + " " + final_period
-    
+        result = f"{final_hours}:{total_minutes} {final_period}"
+    if day is not None:
+        days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+        day_index = days.index(day.lower())
+        new_day_index = (day_index + days_later) % 7
+        result += f", {days[new_day_index].capitalize()}"
     if days_later == 1:
-        return result + " (next day)"
+        result += " (next day)"
     elif days_later > 1:
-        return result + " (" + str(days_later) + " days later)"
-    else:
-        return result
+        result += f" ({days_later} days later)"
 
-print(add_time('8:16 PM', '466:02'))
+    return result
